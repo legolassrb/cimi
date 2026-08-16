@@ -1,5 +1,16 @@
 @import "tailwindcss";
 
+/* Brand palette — sampled from the Bright Smile design comp. Exposed as
+   Tailwind utilities (bg-brand, text-navy, ...) via Tailwind v4's @theme.
+   The button, CTA banner, and bottom nav are all the same blue in the comp
+   (--color-brand) — --color-brand-dark exists only for press/hover states,
+   it's not a second fill color used anywhere statically. */
+@theme {
+  --color-brand: #1656e0;
+  --color-brand-dark: #103aa8;
+  --color-navy: #0b1830;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -37,4 +48,9 @@ body {
 
 .animate-drop-in {
   animation: drop-in 0.7s ease-out both;
+}
+
+/* Soft blue glow behind the CTA banner's tooth icon. */
+.glow-brand {
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.65));
 }
