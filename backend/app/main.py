@@ -1,8 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import text
-from sqlalchemy.ext.asyncio import create_async_engine
 from redis.asyncio import Redis
+from redis.exceptions import RedisError
+from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.ext.asyncio import create_async_engine
 
 from app.core.config import settings
 
@@ -42,13 +44,13 @@ async def status():
         async with _engine.connect() as conn:
             await conn.execute(text("SELECT 1"))
         checks["database"] = "ok"
-    except Exception as exc:
+    except SQLAlchemyError as exc:
         checks["database"] = f"error: {exc}"
 
     try:
         await _redis.ping()
         checks["redis"] = "ok"
-    except Exception as exc:
+    except RedisError as exc:
         checks["redis"] = f"error: {exc}"
 
     return checks

@@ -227,6 +227,7 @@ out/
 next-env.d.ts
 npm-debug.log*
 .eslintcache
+*.tsbuildinfo
 
 # --- Local env files (see .env.example) ---
 # (.env itself is already covered by the "Environments" section above)
