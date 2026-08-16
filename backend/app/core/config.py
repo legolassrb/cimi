@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     env: str = "local"
     database_url: str = "postgresql+asyncpg://cimi:cimi@localhost:5432/cimi"
     redis_url: str = "redis://localhost:6379/0"
-    cors_origins: str = "http://localhost:3000"
+    cors_origins: str = "http://localhost:3000,http://localhost:3001"
 
     @property
     def cors_origins_list(self) -> list[str]:

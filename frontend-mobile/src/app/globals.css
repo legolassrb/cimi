@@ -9,6 +9,18 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* iOS: avoid the bounce-scroll revealing background outside the safe area */
+  overscroll-behavior-y: none;
+}
+
+/* iOS notch / home-indicator safe areas — used by the bottom tab bar and
+   any full-bleed header so content doesn't sit under the hardware chrome. */
+.safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 /* Drops an element into place from above on page load. */

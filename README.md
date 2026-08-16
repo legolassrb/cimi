@@ -1,63 +1,77 @@
 # cimi — Dentist Office Web App
 
-Initial project scaffold: a FastAPI backend and a Next.js frontend, wired
-together, with empty placeholder pages for every route in the MVP site map.
-See [mvp.md](mvp.md) for the full product plan this is based on.
+Initial project scaffold: a FastAPI backend and two Next.js frontends — a
+desktop web app and a separate mobile-first web app — wired together, with
+empty placeholder pages for every route in the MVP site map. See
+[mvp.md](mvp.md) for the full product plan this is based on.
 
-No CI/CD yet — this is just the local pipeline (backend + frontend +
-Postgres + Redis) and a "hello world" to prove the pieces talk to each
-other.
+Both frontends are plain responsive web apps reached through a browser (no
+app-store installs). The mobile one is patient-facing only (no `/admin`) and
+uses a bottom tab bar + iOS safe-area handling instead of the desktop's top
+nav.
+
+No CI/CD deploy pipeline yet — [.github/workflows/validate.yml](.github/workflows/validate.yml)
+only runs lint/type-check/config-validity checks. This README covers the
+local pipeline (backend + frontends + Postgres + Redis) and a "hello world"
+to prove the pieces talk to each other.
 
 ## Quick start
 
 The bare minimum to get it running in a terminal. See further down for
-what each step does, prerequisites, and troubleshooting.
+what each step does, prerequisites, and troubleshooting. Every path below
+lets you bring up the desktop frontend only, the mobile frontend only, or
+both.
 
-**With Docker (full pipeline — backend, frontend, Postgres, Redis):**
+**With Docker:**
 
 ```bash
 cp .env.example .env
-docker compose up --build
+docker compose --profile desktop up --build   # desktop only  → http://localhost:3000
+docker compose --profile mobile up --build    # mobile only   → http://localhost:3001
+docker compose --profile desktop --profile mobile up --build   # both
 ```
 
-Then open http://localhost:3000.
-
-**Without Docker (backend + frontend only, run directly on your machine):**
+**Without Docker:**
 
 ```bash
 cp .env.example .env
 ./utils/setup-backend-env.sh
-./utils/setup-frontend-env.sh
-./utils/start-all.sh
+./utils/setup-frontend-env.sh desktop   # or: mobile | both
+./utils/start-all.sh desktop            # or: mobile | both
 ```
 
-Then open http://localhost:3000. `Ctrl+C` stops both servers.
+`Ctrl+C` stops everything either way.
 
 ## Project structure
 
 ```
 cimi/
-├── backend/            FastAPI app
+├── backend/              FastAPI app
 │   ├── app/
-│   │   ├── main.py      # routes: /health, /api/v1/hello, /api/v1/status
+│   │   ├── main.py        # routes: /health, /api/v1/hello, /api/v1/status
 │   │   └── core/config.py
 │   ├── requirements.txt
 │   └── Dockerfile
-├── frontend/            Next.js app (App Router, TypeScript, Tailwind)
+├── frontend/              Desktop web app (App Router, TypeScript, Tailwind)
 │   └── src/
 │       ├── app/
 │       │   ├── (public)/    # Home, Services, Team, Gallery, About, Book, Login, Account
 │       │   └── admin/       # Dashboard, Appointments, Doctors, Services, Availability, Gallery, Audit Log
 │       ├── components/
 │       └── lib/api.ts       # backend fetch helper (used by the home page)
-├── utils/               Scripts for setting up + starting everything locally, without Docker
+├── frontend-mobile/       Mobile web app — same backend, patient-facing only
+│   └── src/
+│       ├── app/            # Home, Services, Team, Gallery, About, Book, Login, Account
+│       ├── components/     # TopBar, BottomNav (mobile-first shell)
+│       └── lib/api.ts
+├── utils/                 Scripts for setting up + starting everything locally, without Docker
 │   ├── requirements.txt
-│   ├── setup-backend-env.sh   # creates a venv or conda env, installs backend deps
-│   ├── setup-frontend-env.sh  # npm install
+│   ├── setup-backend-env.sh    # creates a venv or conda env, installs backend deps
+│   ├── setup-frontend-env.sh   # npm install — desktop | mobile | both
 │   ├── start-backend.sh
-│   ├── start-frontend.sh
-│   └── start-all.sh
-├── docker-compose.yml   # backend + frontend + postgres + redis, one command
+│   ├── start-frontend.sh       # desktop | mobile
+│   └── start-all.sh            # desktop | mobile | both (default)
+├── docker-compose.yml     # backend + postgres + redis + both frontends (profile-gated)
 ├── .env.example
 └── mvp.md
 ```
@@ -84,23 +98,30 @@ you don't need to edit `.env` for that.
 
 ## 2. Run it — pick one
 
-### Option A: Docker Compose (the full pipeline: backend + frontend + Postgres + Redis)
+### Option A: Docker Compose
+
+`frontend-desktop` and `frontend-mobile` are gated behind Compose
+[profiles](https://docs.docker.com/compose/how-tos/profiles/) so you choose
+which one(s) start — `backend`/`postgres`/`redis` always start regardless.
 
 ```bash
-docker compose up --build
+docker compose --profile desktop up --build                    # desktop only
+docker compose --profile mobile up --build                     # mobile only
+docker compose --profile desktop --profile mobile up --build   # both
 ```
 
-This builds both images and starts all four services. First run installs
-everything inside the containers (nothing on your host machine). Leave it
-running in the terminal; `Ctrl+C` stops it.
+First run installs everything inside the containers (nothing on your host
+machine). Leave it running in the terminal; `Ctrl+C` stops it.
 
 ### Option B: Locally, no Docker
 
 Install dependencies (you run these — they don't run automatically):
 
 ```bash
-./utils/setup-backend-env.sh    # creates backend/.venv (or a conda env, if you have conda)
-./utils/setup-frontend-env.sh   # npm install in frontend/
+./utils/setup-backend-env.sh              # creates backend/.venv (or a conda env, if you have conda)
+./utils/setup-frontend-env.sh desktop     # npm install in frontend/
+./utils/setup-frontend-env.sh mobile      # npm install in frontend-mobile/
+# or: ./utils/setup-frontend-env.sh both  # installs both in one go
 ```
 
 `setup-backend-env.sh` picks conda automatically if it's on your `PATH`,
@@ -111,17 +132,20 @@ CIMI_ENV_TOOL=conda ./utils/setup-backend-env.sh
 CIMI_ENV_TOOL=venv  ./utils/setup-backend-env.sh
 ```
 
-Then start both dev servers together:
+Then start the backend plus whichever frontend(s) you want, together:
 
 ```bash
-./utils/start-all.sh
+./utils/start-all.sh desktop   # backend + desktop frontend
+./utils/start-all.sh mobile    # backend + mobile frontend
+./utils/start-all.sh both      # backend + both frontends (also the default with no argument)
 ```
 
 ...or in separate terminals if you want independent logs:
 
 ```bash
-./utils/start-backend.sh    # http://localhost:8000
-./utils/start-frontend.sh   # http://localhost:3000
+./utils/start-backend.sh              # http://localhost:8000
+./utils/start-frontend.sh desktop     # http://localhost:3000
+./utils/start-frontend.sh mobile      # http://localhost:3001
 ```
 
 Note: without Docker there's no local Postgres/Redis running unless you
@@ -142,29 +166,33 @@ Auto-generated API docs: http://localhost:8000/docs
 
 **Frontend → backend, end to end:**
 
-Open http://localhost:3000 — the home page fetches `/api/v1/hello` from the
+Open http://localhost:3000 (desktop) and/or http://localhost:3001 (mobile)
+— whichever you started. Each home page fetches `/api/v1/hello` from the
 backend on the server side and renders it in a box labeled "Backend says:".
 Green border + `Hello World from FastAPI` means the full chain
-(browser → Next.js server → FastAPI) is wired correctly. A red box means the
-frontend couldn't reach the backend — check that the backend is actually
-running and that `API_URL` in `.env` (or the container env, if using Docker)
-points at it.
+(browser → Next.js server → FastAPI) is wired correctly for that frontend. A
+red box means it couldn't reach the backend — check that the backend is
+actually running and that `API_URL` in `.env` (or the container env, if
+using Docker) points at it.
 
-Every other route in the nav (`/services`, `/team`, `/gallery`, `/about`,
-`/book`, `/login`, `/account`, and everything under `/admin`) is an
-intentionally empty placeholder — click around to confirm routing and the
-two layout shells (public nav vs. admin sidebar) both render.
+Every other route is an intentionally empty placeholder — click around to
+confirm routing:
+- Desktop (`/services`, `/team`, `/gallery`, `/about`, `/book`, `/login`, `/account`, and everything under `/admin`) — two layout shells (public nav vs. admin sidebar).
+- Mobile (`/services`, `/team`, `/gallery`, `/about`, `/book`, `/login`, `/account`) — bottom tab bar + top bar shell, no admin section.
 
 ## Troubleshooting
 
 - **`docker compose up` fails with "no configuration file"** — run it from the repo root (where `docker-compose.yml` lives).
-- **Frontend home page shows the red "could not reach backend" box under Docker** — confirm the `backend` service is healthy (`docker compose ps`); the frontend container reaches it via `http://backend:8000`, not `localhost`.
+- **`docker compose up` starts backend/db but no frontend** — you need at least one `--profile` flag (`desktop`, `mobile`, or both); frontends don't start without one.
+- **Frontend home page shows the red "could not reach backend" box under Docker** — confirm the `backend` service is healthy (`docker compose ps`); the frontend containers reach it via `http://backend:8000`, not `localhost`.
 - **`./utils/start-backend.sh` says "No environment found"** — run `./utils/setup-backend-env.sh` first.
-- **`./utils/start-frontend.sh` says "node_modules not found"** — run `./utils/setup-frontend-env.sh` first.
-- **Port already in use (5432/6379/8000/3000)** — something else on your machine is bound to it; stop that process or change the port mapping in `docker-compose.yml`.
+- **`./utils/start-frontend.sh <target>` says "node_modules not found"** — run `./utils/setup-frontend-env.sh <target>` first.
+- **Port already in use (5432/6379/8000/3000/3001)** — something else on your machine is bound to it; stop that process or change the port mapping in `docker-compose.yml` / the `--port` in `utils/start-frontend.sh`.
 
 ## What's intentionally not here yet
 
-CI/CD, database migrations (Alembic), real data models, auth, and the
-booking engine — see [mvp.md §15](mvp.md#15-build-order--milestones) for the
-intended build order from here.
+CI/CD deploy pipeline, database migrations (Alembic), real data models,
+auth, the booking engine, and real PWA icons for the mobile app (see the
+TODO in `frontend-mobile/src/app/manifest.ts`) — see
+[mvp.md §15](mvp.md#15-build-order--milestones) for the intended build
+order from here.
