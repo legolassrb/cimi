@@ -1,0 +1,10 @@
+# Mirrors backend/requirements.txt — kept here so utils/setup-backend-env.sh
+# has a single, obvious file to point at when creating the local (non-docker)
+# Python environment. If you add a backend dependency, update BOTH files.
+
+fastapi==0.115.0
+uvicorn[standard]==0.32.0
+pydantic-settings==2.6.0
+sqlalchemy[asyncio]==2.0.36
+asyncpg==0.30.0
+redis==5.2.0
