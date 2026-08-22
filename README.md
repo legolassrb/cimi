@@ -31,7 +31,7 @@ docker compose --profile mobile up --build    # mobile only   → http://localho
 docker compose --profile desktop --profile mobile up --build   # both
 ```
 
-**Without Docker:**
+**Without Docker (macOS/Linux):**
 
 ```bash
 cp .env.example .env
@@ -40,7 +40,17 @@ cp .env.example .env
 ./utils/start-all.sh desktop            # or: mobile | both
 ```
 
-`Ctrl+C` stops everything either way.
+**Without Docker (Windows PowerShell):**
+
+```powershell
+Copy-Item .env.example .env
+.\utils\setup-backend-env.ps1
+.\utils\setup-frontend-env.ps1 desktop   # or: mobile | both
+.\utils\start-all.ps1 desktop            # or: mobile | both
+```
+
+`Ctrl+C` stops everything either way. If Windows blocks the `.ps1` scripts
+from running, see Troubleshooting below.
 
 ## Project structure
 
@@ -70,7 +80,8 @@ cimi/
 │   ├── setup-frontend-env.sh   # npm install — desktop | mobile | both
 │   ├── start-backend.sh
 │   ├── start-frontend.sh       # desktop | mobile
-│   └── start-all.sh            # desktop | mobile | both (default)
+│   ├── start-all.sh            # desktop | mobile | both (default)
+│   └── *.ps1                   # PowerShell twin of every .sh script above, same names/args, for Windows
 ├── docker-compose.yml     # backend + postgres + redis + both frontends (profile-gated)
 ├── .env.example
 └── mvp.md
@@ -148,6 +159,26 @@ Then start the backend plus whichever frontend(s) you want, together:
 ./utils/start-frontend.sh mobile      # http://localhost:3001
 ```
 
+**On Windows**, every script above has a `.ps1` twin with the same name and
+arguments — run them from PowerShell (not `cmd.exe`) from the repo root:
+
+```powershell
+.\utils\setup-backend-env.ps1
+.\utils\setup-frontend-env.ps1 desktop     # or: mobile | both
+
+.\utils\start-all.ps1 desktop              # or: mobile | both
+# ...or individually, in separate windows, for independent logs:
+.\utils\start-backend.ps1                  # http://localhost:8000
+.\utils\start-frontend.ps1 desktop         # http://localhost:3000
+.\utils\start-frontend.ps1 mobile          # http://localhost:3001
+```
+
+`setup-backend-env.ps1` auto-detects conda the same way; force one with
+`$env:CIMI_ENV_TOOL = "conda"` / `"venv"` before running it.
+`start-all.ps1` runs the backend/frontend(s) as PowerShell background jobs
+in the same window rather than backgrounded shell processes — functionally
+equivalent, `Ctrl+C` still stops everything.
+
 Note: without Docker there's no local Postgres/Redis running unless you
 start your own — that's fine for the hello-world check below, since only
 `/api/v1/status` touches those two.
@@ -187,7 +218,8 @@ confirm routing:
 - **Frontend home page shows the red "could not reach backend" box under Docker** — confirm the `backend` service is healthy (`docker compose ps`); the frontend containers reach it via `http://backend:8000`, not `localhost`.
 - **`./utils/start-backend.sh` says "No environment found"** — run `./utils/setup-backend-env.sh` first.
 - **`./utils/start-frontend.sh <target>` says "node_modules not found"** — run `./utils/setup-frontend-env.sh <target>` first.
-- **Port already in use (5432/6379/8000/3000/3001)** — something else on your machine is bound to it; stop that process or change the port mapping in `docker-compose.yml` / the `--port` in `utils/start-frontend.sh`.
+- **Port already in use (5432/6379/8000/3000/3001)** — something else on your machine is bound to it; stop that process or change the port mapping in `docker-compose.yml` / the `--port` in `utils/start-frontend.sh` (or `.ps1` equivalent).
+- **PowerShell refuses to run the `.ps1` scripts** ("running scripts is disabled on this system") — one-time fix, from an elevated or regular PowerShell prompt: `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned`.
 
 ## What's intentionally not here yet
 
