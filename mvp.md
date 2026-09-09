@@ -1,5 +1,16 @@
 # Dentist Office Web App — MVP Planning Document
 
+> **Status note (2026-09-02):** `frontend-mobile`'s public pages currently
+> implement a different, simpler brief instead of this document's public
+> scope — a named practice ("Farmadent"), bilingual (SR/EN) info-only site
+> with **no online booking, no accounts** (§4.1's booking flow and §4.2
+> admin mode are not built there). See
+> [frontend-mobile/README.md](frontend-mobile/README.md) for what's
+> actually shipped. `frontend`'s desktop app and the backend are
+> unaffected — this MVP plan still stands for them, and for `frontend-mobile`
+> if/when booking scope resumes. The stub routes `/book`, `/login`,
+> `/account` are kept (unlinked) in `frontend-mobile` for that reason.
+
 ## 1. Overview & Purpose
 
 A standalone, responsive web application for a modern dentist office. The app gives prospective and existing patients an easy way to learn about the practice's services and team, view a photo gallery of the office/work, see relevant statistics, and book appointments online — reducing phone-based scheduling overhead for staff.

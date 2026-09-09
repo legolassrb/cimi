@@ -1,30 +1,84 @@
 @import "tailwindcss";
 
-/* Brand palette — sampled from the Bright Smile design comp. Exposed as
-   Tailwind utilities (bg-brand, text-navy, ...) via Tailwind v4's @theme.
-   The button, CTA banner, and bottom nav are all the same blue in the comp
-   (--color-brand) — --color-brand-dark exists only for press/hover states,
-   it's not a second fill color used anywhere statically. */
+/* Farmadent visual system. Rounded, flat, warm-cool — replaces the earlier
+   flat/no-radius "Bright Smile" system (that one came from a separate,
+   deferred spec: docs/specs/staff-patient-app.md — see that file's status
+   note). Tokens are named with the "color", "shadow" and "font" prefixes
+   on purpose: that's what Tailwind v4's @theme reads to auto-generate
+   utilities, so e.g. --color-accent-700 gives you bg-accent-700 and
+   text-accent-700 for free, and --shadow-md gives you shadow-md. */
 @theme {
-  --color-brand: #1656e0;
-  --color-brand-dark: #103aa8;
-  --color-navy: #0b1830;
+  --color-bg: #f1f3f7; /* page ground */
+  --color-surface: #e2e8f1; /* cards */
+  --color-text: #1b2028;
+  --color-divider: color-mix(in srgb, #1b2028 16%, transparent);
+
+  --color-accent: #39609e; /* primary */
+  --color-accent-100: #eaf0f8;
+  --color-accent-200: #d3e0f1;
+  --color-accent-300: #adc4e2;
+  --color-accent-400: #7b9dcb;
+  --color-accent-500: #39609e;
+  --color-accent-600: #2f5288;
+  --color-accent-700: #26436f;
+  --color-accent-800: #1c3153;
+  --color-accent-900: #142338;
+
+  --color-accent-2: #5f8b85; /* second voice, for the calm/sage cards */
+  --color-accent-2-200: #d2e5e2;
+  --color-accent-2-800: #2b423f;
+  --color-accent-2-900: #1d2c2a;
+
+  --color-neutral-100: #f7f9fb;
+  --color-neutral-300: #dbe1ea;
+  --color-neutral-800: #414855;
+  --color-neutral-900: #232935;
+
+  --shadow-sm: 0 1px 2px color-mix(in srgb, #232935 14%, transparent);
+  --shadow-md: 0 3px 10px color-mix(in srgb, #232935 16%, transparent);
+  --shadow-lg: 0 12px 32px color-mix(in srgb, #232935 22%, transparent);
+
+  /* next/font/google injects the actual font files + these variable names
+     via className on <html> (see layout.tsx) — the @theme entry just wires
+     them into font-heading/font-body utilities. */
+  --font-heading: var(--font-caprasimo), cursive;
+  --font-body: var(--font-figtree), sans-serif;
 }
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+html {
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
   /* iOS: avoid the bounce-scroll revealing background outside the safe area */
   overscroll-behavior-y: none;
 }
 
-/* iOS notch / home-indicator safe areas — used by the bottom tab bar and
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+/* Never leave the browser default focus ring, but keep a visible one for
+   keyboard navigation. */
+:focus {
+  outline: none;
+}
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* iOS notch / home-indicator safe areas — used by the sticky call bar and
    any full-bleed header so content doesn't sit under the hardware chrome. */
 .safe-top {
   padding-top: env(safe-area-inset-top);
@@ -34,23 +88,49 @@ body {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-/* Drops an element into place from above on page load. */
-@keyframes drop-in {
+/* Required treatment for every photograph — see mvp brief §1. Applied via
+   the shared Photo component, never ad hoc. */
+.washed {
+  filter: saturate(0.55) contrast(0.9) brightness(1.06) opacity(0.95);
+}
+
+/* Hides the scrollbar on horizontally scrolling rows (chips, treatment
+   list, reviews) — content stays scrollable via touch/trackpad/keyboard,
+   only the visual scrollbar chrome is hidden. */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* Treatment detail push-view transition. */
+@keyframes detail-in {
   from {
     opacity: 0;
-    transform: translateY(-48px);
+    transform: translateX(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.animate-detail-in {
+  animation: detail-in 280ms ease both;
+}
+
+/* Accordion panel open transition (first-visit FAQ). */
+@keyframes accordion-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
-
-.animate-drop-in {
-  animation: drop-in 0.7s ease-out both;
-}
-
-/* Soft blue glow behind the CTA banner's tooth icon. */
-.glow-brand {
-  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.65));
+.animate-accordion-in {
+  animation: accordion-in 220ms ease both;
 }

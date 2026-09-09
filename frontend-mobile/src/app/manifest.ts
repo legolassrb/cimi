@@ -7,12 +7,12 @@ import type { MetadataRoute } from "next";
 // goes further than a scaffold.
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Bright Smile",
-    short_name: "Bright Smile",
-    description: "Book and manage dentist appointments from your phone.",
+    name: "Farmadent",
+    short_name: "Farmadent",
+    description: "Farmadent — porodična stomatološka ordinacija u Prijepolju.",
     start_url: "/",
     display: "standalone",
-    background_color: "#ffffff",
-    theme_color: "#1a46d1",
+    background_color: "#f1f3f7",
+    theme_color: "#39609e",
   };
 }

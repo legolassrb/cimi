@@ -11,12 +11,23 @@ Status of the implementation against [mvp.md](mvp.md), as of commits
 - **`.env.example` has never been committed**, in either commit. On a fresh clone, step 1 of the README (`cp .env.example .env`) fails.
 - Fix: `git add docker-compose.yml .env.example` (and `.gitignore`, if the `.DS_Store` fix from earlier isn't in yet either) and commit.
 
-## §4.1 Public pages — 🟡 routed, not built
+## §4.1 Public pages — 🟡 desktop only; mobile has diverged from this doc
 
-Every route exists on both frontend and frontend-mobile (`/services`, `/team`,
-`/gallery`, `/about`, `/book`, `/login`, `/account`) but each is an empty
-`PageStub` — no real content, no data fetching beyond the home page's
-hello-world check. Concretely missing:
+**`frontend-mobile` update (2026-09-02):** its public routes no longer
+track this section — see the status note at the top of
+[mvp.md](mvp.md) and [frontend-mobile/README.md](frontend-mobile/README.md).
+It now ships a built-out, bilingual, no-booking info site for a named
+practice ("Farmadent") at `/`, `/oblasti(/[slug])`, `/tim`, `/prostor`,
+`/cene`, `/iskustva`, `/prvi-dolazak`, `/kontakt` (content-complete, from
+static dictionaries, not `Service`/`Doctor` backend data). The old
+`/services`, `/team`, `/gallery`, `/about` stubs were removed as
+superseded; `/book`, `/login`, `/account` remain as unlinked stubs.
+
+`frontend` (desktop) is unaffected and still matches the description
+below: every route exists (`/services`, `/team`, `/gallery`, `/about`,
+`/book`, `/login`, `/account`) but each is an empty `PageStub` — no real
+content, no data fetching beyond the home page's hello-world check.
+Concretely missing:
 - Services list/detail — no `Service` data, no category grouping
 - Doctor profile cards — no `Doctor` data, no bios/credentials
 - Statistics/trust numbers — no `StatisticSnapshot` data
@@ -32,11 +43,13 @@ have CRUD logic, real appointment data, internal stats, or the site-traffic
 analytics view described in the doc. By design, `frontend-mobile` has **no**
 admin section at all (office staff are assumed desktop users).
 
-## §5 Site map — 🟢 matches closely
+## §5 Site map — 🟢 desktop matches closely; mobile has its own site map now
 
-The best-covered section so far. Desktop's routes are essentially a 1:1
-match to the doc's public + admin tree ([mvp.md §5](mvp.md#5-information-architecture-site-map)).
-Mobile deliberately covers only the public/patient subset.
+Desktop's routes are essentially a 1:1 match to the doc's public + admin
+tree ([mvp.md §5](mvp.md#5-information-architecture-site-map)). Mobile no
+longer follows this site map at all — see §4.1 above — it has its own
+(Farmadent's `/oblasti`, `/tim`, `/prostor`, `/cene`, `/iskustva`,
+`/prvi-dolazak`, `/kontakt`), still deliberately public-only, no admin.
 
 ## §6 Data model — 🔴 not started
 
