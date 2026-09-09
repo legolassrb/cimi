@@ -35,7 +35,7 @@ export function BellIcon({ className }: IconProps) {
 export function CalendarIcon({ className }: IconProps) {
   return (
     <svg {...base} className={className} aria-hidden="true">
-      <rect x="3" y="5" width="18" height="16" rx="2" />
+      <rect x="3" y="5" width="18" height="16" />
       <path d="M16 3v4M8 3v4M3 10h18" />
     </svg>
   );
@@ -70,7 +70,7 @@ export function HomeIcon({ className }: IconProps) {
 export function GalleryIcon({ className }: IconProps) {
   return (
     <svg {...base} className={className} aria-hidden="true">
-      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <rect x="3" y="5" width="18" height="14" />
       <circle cx="8.5" cy="10" r="1.5" />
       <path d="M3 16l5-4 4 3 3-2 6 5" />
     </svg>
@@ -89,7 +89,7 @@ export function UserIcon({ className }: IconProps) {
 export function ImagePlaceholderIcon({ className }: IconProps) {
   return (
     <svg {...base} className={className} aria-hidden="true">
-      <rect x="3" y="4" width="18" height="16" rx="2" />
+      <rect x="3" y="4" width="18" height="16" />
       <circle cx="8" cy="9" r="1.5" />
       <path d="M4 17l5-5 4 4 3-3 4 4" />
     </svg>

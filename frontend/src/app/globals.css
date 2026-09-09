@@ -1,14 +1,45 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Visual system — flat/architectural, per docs/specs/staff-patient-app.md.
+   Only the appearance from that spec is applied here; the rest of that
+   spec (roles, domain model, staff/patient shells) is not implemented. */
+@theme {
+  --color-bg: #f3f2f2;
+  --color-surface: #eae9e9;
+  --color-ink: #201e1d;
+  --color-accent: #ec3013;
+  --color-accent-hover: #dd2b0f;
+  --color-accent-deep: #ae1800;
+  --color-tint: #fff2ef;
+  --color-tint-2: #ffe0d9;
+  --color-grey-200: #eae7e7;
+  --color-grey-300: #d7d3d3;
+  --color-grey-500: #9b9797;
+  --color-grey-600: #7d7979;
+  --color-grey-700: #605d5d;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--color-bg);
+  color: var(--color-ink);
+}
+
+/* No rounded corners anywhere, per the visual system — enforced globally
+   rather than by hunting down every Tailwind rounded-* class, so nothing
+   can silently reintroduce one later. !important is deliberate: it only
+   needs to beat utility-class specificity, nothing else on this property. */
+* {
+  border-radius: 0 !important;
+}
+
+/* Never leave the browser default focus ring, but keep a visible one for
+   keyboard navigation. */
+:focus {
+  outline: none;
+}
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 /* Drops an element into place from above on page load. */
